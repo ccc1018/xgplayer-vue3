@@ -1,0 +1,72 @@
+{
+  "name": "xgplayer-vue3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint \"**/*.{ts,tsx,js,jsx}\" --fix",
+    "lint:ci": "eslint \"**/*.{ts,tsx,js,jsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,cjs,mjs,json}\"",
+    "format:ci": "prettier --list-different \"**/*.{ts,tsx,js,jsx}\"",
+    "postinstall": "husky install",
+    "commit": "git-cz"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "axios": "^1.9.0",
+    "vue": "^3.5.16",
+    "vue-router": "^4.5.1",
+    "xgplayer": "^3.0.22",
+    "xgplayer-hls": "^3.0.22",
+    "xgplayer-subtitles": "^3.0.22"
+  },
+  "devDependencies": {
+    "@arco-design/web-vue": "^2.57.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^9.28.0",
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/node": "^22.15.30",
+    "@types/vue": "^2.0.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/tsconfig": "^0.7.0",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.11.1",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^4.1.8",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.33.1",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.10"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,cjs,mjs,json}": [
+      "pnpm lint",
+      "pnpm format"
+    ],
+    "*.vue": [
+      "pnpm lint",
+      "pnpm format"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=9.0.0"
+  }
+}
