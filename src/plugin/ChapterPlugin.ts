@@ -1,79 +1,3 @@
-// import { Plugin } from 'xgplayer';
-// import type { IPluginOptions } from 'xgplayer/es/plugin/plugin';
-// const { POSITIONS } = Plugin
-// interface Chapter {
-//   title: string;
-//   start: number;
-//   duration: number;
-// }
-// export default class ChapterPlugin extends Plugin {
-//   static get pluginName() {
-//     return 'chapterPlugin'
-//   }
-//   // static get defaultConfig() {
-//   //   return {
-//   //     position: POSITIONS.CONTROLS_LEFT, // 挂载位置：控制栏左侧
-//   //     chapters: [] // 默认章节数据 [{start: 秒数, title: "章节名"}]
-//   //   };
-//   // }
-//   static get defaultConfig() {
-//     return {
-//       position: POSITIONS.CONTROLS_LEFT,
-//       text: '章节',
-//       icon: '<svg t="1749716751903" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5035" width="200" height="200"><path d="M400 876.8l339.2-339.2v-44.8L400 156.8l-44.8 44.8 313.6 313.6-313.6 316.8z" fill="#707070" p-id="5036"></path></svg>',
-//       indexe: 1,
-//       iconStyle: {
-//         width: '20px',
-//         height: '20px',
-//       },
-//       textStyle: {
-//         textAlgin: 'center',
-//         fontSize: '12px',
-//         color: '#fff',
-//       },
-//     }
-//   }
-//   constructor(args: IPluginOptions | undefined) {
-//     super(args)
-//   }
-
-//   beforePlayerInit() {
-//     // TODO 播放器调用start初始化播放源之前的逻辑
-//   }
-
-//   afterPlayerInit() {
-//     // TODO 播放器调用start初始化播放源之后的逻辑
-//   }
-
-//   afterCreate() {
-//     console.log(this);
-//     this.setAttr('data-index', '3');
-//     const btn = this.find('.chapter-btn');
-//     const list = this.find('.chapter-dropdown');
-//     console.log(btn);
-//     btn?.addEventListener("click", () => {
-//       console.log(1);
-//       if (list && list.style) {
-//         list.style.display = list.style.display === 'none' ? 'block' : 'none';
-//       }
-//     });
-
-//   }
-//   destroy() {
-//   }
-//   render() {
-//     return `
-//     <xg-icon class="xgplayer-chapter">
-//       <span class="chapter-btn">章节</span>
-//       <ul class="chapter-dropdown" style="display:none;">
-//         ${this.config.chapters.map((ch: Chapter) => `
-//           <li class="chapter-list"  data-start="${ch.start}">${ch.title}</li>
-//         `).join('')}
-//       </ul>
-//     </xg-icon>
-//   `;
-//   }
-// }
 import { Plugin } from 'xgplayer';
 import type { IPluginOptions } from 'xgplayer/es/plugin/plugin';
 
@@ -106,7 +30,7 @@ export default class ChapterPlugin extends Plugin {
       },
       textStyle: {
         textAlign: 'center',
-        fontSize: '12px',
+        fontSize: '16px',
         color: '#fff',
       },
       chapters: [] as Chapter[], // 确保有默认值

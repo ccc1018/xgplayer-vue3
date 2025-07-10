@@ -10,12 +10,14 @@ import 'xgplayer/es/plugins/track/index.css';
 import TextTrack from 'xgplayer/es/plugins/track';
 import ChapterPlugin from '@/plugin/ChapterPlugin';
 
-interface Chapter {
-  start: number;
-  title: string;
-  duration: string | number;
-}
-const chapters = ref<Chapter[]>(JSON.parse(localStorage.getItem('chapters') || 'null'));
+// interface Chapter {
+//   start: number;
+//   title: string;
+//   duration: string | number;
+// }
+// const chapters = ref<Chapter[]>(JSON.parse(localStorage.getItem('chapters') || 'null'));
+// console.log(chapters.value);
+
 const player = ref<XGPlayer | null>(null);
 
 const props = defineProps({
@@ -45,7 +47,7 @@ const initPlayer = async () => {
     plugins: [TextTrack, ChapterPlugin],
     chapterPlugin: {
       // 配置项键名需与 pluginName 一致
-      chapters: chapters.value,
+      chapters: [],
     },
     //播放器进度条故事点信息
     progressDot: [

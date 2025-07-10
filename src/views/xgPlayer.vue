@@ -93,10 +93,11 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
+import { generateChapter } from '@/api/video';
 import { reactive } from 'vue';
 import XGPlayer from '@/components/video-XGPlayer.vue';
 const uploadData = JSON.parse(localStorage.getItem('upload') || 'null');
+console.log(uploadData.videoUrl);
 interface Chapter {
   title: string;
   start: number;
@@ -104,6 +105,7 @@ interface Chapter {
 }
 const options = reactive({
   url: uploadData.videoUrl,
+  // url: "http://localhost/video.mp4",
   poster: uploadData.coverPicture,
   width: '1196px',
   height: '673',
@@ -156,9 +158,9 @@ const addCustomChapter = async () => {
     return;
   }
   try {
-    const chaptersRes = await axios.get('http://192.168.1.119:8080/Chapter');
-    options.chapters = chaptersRes.data.data;
-    localStorage.setItem('chapters', JSON.stringify(chaptersRes.data.data));
+    const res = await generateChapter();
+    options.chapters = res.data.chapters;
+    localStorage.setItem('chapters', JSON.stringify(res.data.chapters));
   } catch (error) {
     console.error('Error fetching chapters:', error);
   }
