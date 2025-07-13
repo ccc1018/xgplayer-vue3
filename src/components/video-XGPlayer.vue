@@ -9,23 +9,30 @@ import 'xgplayer/dist/index.min.css';
 import 'xgplayer/es/plugins/track/index.css';
 import TextTrack from 'xgplayer/es/plugins/track';
 import ChapterPlugin from '@/plugin/ChapterPlugin';
+import { useChapterStore } from '@/store/chapters';
 
-// interface Chapter {
-//   start: number;
-//   title: string;
-//   duration: string | number;
-// }
-// const chapters = ref<Chapter[]>(JSON.parse(localStorage.getItem('chapters') || 'null'));
-// console.log(chapters.value);
-
+const chapterStore = useChapterStore();
 const player = ref<XGPlayer | null>(null);
-
+import { watch } from 'vue';
+import { defineExpose } from 'vue';
 const props = defineProps({
   options: {
     type: Object,
     required: true,
   },
 });
+watch(
+  () => props.options.chapters,
+  () => {
+    // 销毁并重建播放器
+    if (player.value) {
+      player.value.destroy();
+      player.value = null;
+    }
+    initPlayer();
+  },
+);
+defineExpose({ player });
 const initPlayer = async () => {
   if (!props.options) return;
   player.value = new XGPlayer({
@@ -47,7 +54,8 @@ const initPlayer = async () => {
     plugins: [TextTrack, ChapterPlugin],
     chapterPlugin: {
       // 配置项键名需与 pluginName 一致
-      chapters: [],
+      chapters:
+        props.options?.chapters.length > 0 ? props.options?.chapters : chapterStore.chapters,
     },
     //播放器进度条故事点信息
     progressDot: [

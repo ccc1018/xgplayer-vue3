@@ -2,12 +2,13 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 const mock = new MockAdapter(axios, { delayResponse: 1000 });
-
+// const mock = new MockAdapter(axios, { delayResponse: 60000 }); // 1分钟
 mock.onPost('/upload').reply(200, {
   code: 200,
   message: 'success',
   data: {
     videoUrl: 'http://localhost/video.mp4',
+    coverPicture: '',
   },
 });
 

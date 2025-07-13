@@ -51,110 +51,119 @@ export default class ChapterPlugin extends Plugin {
   private injectStyles() {
     const style = document.createElement('style');
     style.textContent = `
-      .xgplayer-chapter {
-        display: flex;
-        align-items: center;
-        height: 100%;
-        position: relative;
-        cursor: pointer;
-        padding: 0 10px;
-      }
-      
-      .chapter-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 12px;
-        white-space: nowrap;
-        transition: all 0.3s ease;
-      }
-      
-      .chapter-btn:hover {
-        color: #ff9500;
-      }
-      
-      .chapter-icon {
-        width:20px;
-        height: 20px;
-        display: inline-block;
-        margin-right: 4px;
-        transition: transform 0.3s ease;
-      }
-      
-      .chapter-icon.active {
-        transform: rotate(180deg);
-      }
-      
-      .chapter-list {
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.85);
-        border-radius: 6px;
-        padding: 8px 0;
-        list-style: none;
-        margin: 0;
-        min-width: 180px;
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 100;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateX(-50%) translateY(10px);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      }
-      
-      .chapter-list.active {
-        opacity: 1;
-        visibility: visible;
-        transform: translateX(-50%) translateY(0);
-      }
-      
-      .chapter-list::-webkit-scrollbar {
-        width: 6px;
-      }
-      
-      .chapter-list::-webkit-scrollbar-thumb {
-        background: rgba(255, 149, 0, 0.5);
-        border-radius: 3px;
-      }
-      
-      .chapter-list li {
-        padding: 8px 16px;
-        white-space: nowrap;
-        cursor: pointer;
-        color: #fff;
-        font-size: 13px;
-        text-align: left;
-        transition: all 0.2s ease;
-        display: flex;
-        justify-content: space-between;
-      }
-      
-      .chapter-list li:hover {
-        background: rgba(255, 149, 0, 0.15);
-      }
-      
-      .chapter-list li.active {
-        color: #ff9500;
-        background: rgba(255, 149, 0, 0.1);
-      }
-      
-      .chapter-time {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 12px;
-        margin-left: 10px;
-      }
-      
-      .chapter-list li:hover .chapter-time {
-        color: rgba(255, 149, 0, 0.8);
-      }
-    `;
-    this.appendChild(style);
+    .xgplayer-chapter {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      padding: 0 10px;
+    }
+    .chapter-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+    .chapter-btn:hover {
+      color: #00a1d6;
+    }
+    .chapter-icon {
+      width:20px;
+      height: 20px;
+      display: inline-block;
+      margin-right: 4px;
+      transition: transform 0.3s;
+    }
+    .chapter-icon.active {
+      transform: rotate(180deg);
+    }
+    .chapter-list {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(24, 24, 28, 0.92);
+      border-radius: 12px;
+      padding: 8px 0;
+      list-style: none;
+      margin: 0;
+      min-width: 200px;
+      max-height: 320px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      border: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(10px);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .chapter-list.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .chapter-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chapter-list::-webkit-scrollbar-thumb {
+      background: rgba(0,161,214,0.25);
+      border-radius: 3px;
+    }
+    .chapter-list li {
+      padding: 0 18px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      white-space: nowrap;
+      cursor: pointer;
+      color: #fff;
+      font-size: 15px;
+      text-align: left;
+      border: none;
+      background: none;
+      transition: all 0.18s;
+      border-radius: 6px;
+      margin: 0 6px;
+      margin-bottom: 2px;
+    }
+    .chapter-list li:last-child {
+      margin-bottom: 0;
+    }
+    .chapter-list li:hover {
+      background: rgba(0,161,214,0.12);
+      color: #00a1d6;
+    }
+    .chapter-list li.active {
+      color: #00a1d6;
+      background: rgba(0,161,214,0.18);
+      font-weight: bold;
+    }
+    .chapter-title {
+      flex: 1 1 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chapter-time {
+      color: #aaa;
+      font-size: 12px;
+      margin-left: 12px;
+      flex-shrink: 0;
+      min-width: 48px;
+      text-align: right;
+    }
+    .chapter-list li:hover .chapter-time,
+    .chapter-list li.active .chapter-time {
+      color: #00a1d6;
+    }
+  `;
+    document.head.appendChild(style);
   }
 
   private initElements() {
@@ -271,11 +280,11 @@ export default class ChapterPlugin extends Plugin {
     }
   }
 
-  // private formatTime(seconds: number): string {
-  //   const mins = Math.floor(seconds / 60);
-  //   const secs = Math.floor(seconds % 60);
-  //   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  // }
+  private formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
 
   render() {
     return `
@@ -286,7 +295,8 @@ export default class ChapterPlugin extends Plugin {
           .map(
             (ch: Chapter) => `
           <li data-start="${ch.start}">
-            <span>${ch.title}</span>
+            <span class="chapter-title">${ch.title}</span>
+            <span class="chapter-time">${this.formatTime ? this.formatTime(ch.start) : ''}</span>
           </li>
         `,
           )
