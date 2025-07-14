@@ -1,27 +1,24 @@
 // src/store/chapters.ts
+import type { GenerateChapterResponse } from '@/api/video/type';
 import { defineStore } from 'pinia';
-
-export interface Chapter {
-  start: number;
-  title: string;
-  duration: string | number;
-}
 
 export const useChapterStore = defineStore('chapter', {
   state: () => ({
-    chapters: [] as Chapter[],
+    chapters: [] as GenerateChapterResponse[],
   }),
   actions: {
-    setChapters(chapters: Chapter[]) {
+    getChapters() {
+      return this.chapters;
+    },
+    setChapters(chapters: GenerateChapterResponse[]) {
       this.chapters = chapters;
     },
-    addChapter(chapter: Chapter) {
-      this.chapters.push(chapter);
+    // addChapter(chapter: Chapter) {
+    //   this.chapters.push(chapter);
+    // },
+    clearChapters() {
+      this.chapters = [];
     },
-    // 你可以添加更多方法
   },
-  persist: {
-    key: 'chapters', // localStorage 的 key
-    storage: localStorage,
-  },
+  persist: true, // 一行即可
 });
