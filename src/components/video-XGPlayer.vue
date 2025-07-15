@@ -49,8 +49,10 @@ const initPlayer = async () => {
         props.options?.chapters.length > 0 ? props.options?.chapters : chapterStore.chapters,
     },
     //播放器进度条故事点信息
-    // progressDot: props.options.progressDot.length > 0 ? props.options.progressDot : JSON.parse(localStorage.getItem('progressDot') || '[]'),
-    progressDot: props.options.progressDot,
+    progressDot:
+      props.options.progressDot.length > 0
+        ? props.options.progressDot
+        : JSON.parse(localStorage.getItem('progressDot') || '[]'),
     thumbnail: props.options.thumbnail,
     lang: 'zh-cn',
     controls: {
@@ -89,9 +91,20 @@ onMounted(() => {
   initPlayer(); // 确保在 DOM 渲染完成后调用播放器初始化
 });
 watch(
-  () => props.options,
+  () => [
+    props.options.url,
+    props.options.poster,
+    props.options.width,
+    props.options.height,
+    props.options.progressDot,
+    props.options.thumbnail,
+    props.options.texttrack,
+    props.options.chapters,
+  ],
   () => {
     // 销毁并重建播放器
+    console.log(props.options);
+
     if (player.value) {
       player.value.destroy();
       player.value = null;

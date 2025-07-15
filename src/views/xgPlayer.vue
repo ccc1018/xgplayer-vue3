@@ -44,6 +44,7 @@
                 class="custom-tabs"
                 :animation="true"
                 type="rounded"
+                @change="handleTabChange"
               >
                 <a-tab-pane key="1" title="AI字幕&章节">
                   <div class="p-3">
@@ -62,33 +63,37 @@
                       </a-tabs>
                     </div>
                     <!-- 字幕区域 - 时间轴风格 -->
-                    <div
-                      v-if="activeSubTab === 'subtitle'"
-                      class="max-h-[600px] overflow-y-auto custom-scrollbar py-1"
-                    >
-                      <div class="timeline relative pl-6">
-                        <div
-                          v-for="(item, index) in subtitleList"
-                          :key="index"
-                          :class="[
-                            'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
-                            'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
-                          ]"
-                        >
-                          <!-- 竖线 -->
+                    <div v-if="activeSubTab === 'subtitle'">
+                      <div v-if="subtitleLoading" class="flex justify-center items-center h-60">
+                        <a-spin size="large" tip="字幕加载中..." />
+                      </div>
+                      <div v-else class="max-h-[600px] overflow-y-auto custom-scrollbar py-1">
+                        <div class="timeline relative pl-6">
                           <div
-                            v-if="index !== subtitleList.length - 1"
-                            class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
-                          ></div>
-                          <!-- 圆点 -->
-                          <div
-                            class="w-3 h-3 rounded-full z-10 bg-blue-500 border-2 border-white"
-                            style="margin-left: -0.625rem"
-                          ></div>
-                          <!-- 内容 -->
-                          <div class="ml-4 flex-1 min-w-0">
-                            <div class="font-medium text-gray-800 dark:text-gray-100 text-sm mb-1">
-                              {{ item.text }}
+                            v-for="(item, index) in subtitleList"
+                            :key="index"
+                            :class="[
+                              'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
+                              'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
+                            ]"
+                          >
+                            <!-- 竖线 -->
+                            <div
+                              v-if="index !== subtitleList.length - 1"
+                              class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
+                            ></div>
+                            <!-- 圆点 -->
+                            <div
+                              class="w-3 h-3 rounded-full z-10 bg-blue-500 border-2 border-white"
+                              style="margin-left: -0.625rem"
+                            ></div>
+                            <!-- 内容 -->
+                            <div class="ml-4 flex-1 min-w-0">
+                              <div
+                                class="font-medium text-gray-800 dark:text-gray-100 text-sm mb-1"
+                              >
+                                {{ item.text }}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -96,50 +101,52 @@
                     </div>
 
                     <!-- 章节区域 - 时间轴风格 -->
-                    <div
-                      v-if="activeSubTab === 'chapter'"
-                      class="max-h-[600px] overflow-y-auto custom-scrollbar py-1"
-                    >
-                      <div class="timeline relative pl-6">
-                        <div
-                          v-for="(item, index) in chapterStore.chapters"
-                          :key="index"
-                          @click="seekTo(item.start)"
-                          :class="[
-                            'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
-                            currentChapterIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : '',
-                            'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
-                          ]"
-                        >
-                          <!-- 竖线 -->
+                    <div v-if="activeSubTab === 'chapter'">
+                      <div v-if="chapterLoading" class="flex justify-center items-center h-60">
+                        <a-spin size="large" tip="章节加载中..." />
+                      </div>
+                      <div v-else class="max-h-[600px] overflow-y-auto custom-scrollbar py-1">
+                        <div class="timeline relative pl-6">
                           <div
-                            v-if="index !== chapterStore.chapters.length - 1"
-                            class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
-                          ></div>
-                          <!-- 圆点 -->
-                          <div
+                            v-for="(item, index) in chapterStore.chapters"
+                            :key="index"
+                            @click="seekTo(item.start)"
                             :class="[
-                              'w-3 h-3 rounded-full z-10',
-                              currentChapterIndex === index
-                                ? 'bg-blue-500 border-2 border-white'
-                                : 'bg-blue-200',
+                              'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
+                              currentChapterIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : '',
+                              'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
                             ]"
-                            style="margin-left: -0.625rem"
-                          ></div>
-                          <!-- 内容 -->
-                          <div class="ml-4 flex-1 min-w-0">
+                          >
+                            <!-- 竖线 -->
                             <div
-                              class="font-semibold text-gray-800 dark:text-gray-100 text-sm flex items-center"
-                            >
-                              {{ item.title }}
-                              <span
-                                v-if="currentChapterIndex === index"
-                                class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full"
-                                >播放中</span
+                              v-if="index !== chapterStore.chapters.length - 1"
+                              class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
+                            ></div>
+                            <!-- 圆点 -->
+                            <div
+                              :class="[
+                                'w-3 h-3 rounded-full z-10',
+                                currentChapterIndex === index
+                                  ? 'bg-blue-500 border-2 border-white'
+                                  : 'bg-blue-200',
+                              ]"
+                              style="margin-left: -0.625rem"
+                            ></div>
+                            <!-- 内容 -->
+                            <div class="ml-4 flex-1 min-w-0">
+                              <div
+                                class="font-semibold text-gray-800 dark:text-gray-100 text-sm flex items-center"
                               >
-                            </div>
-                            <div class="text-xs text-blue-500 font-mono text-right">
-                              {{ formatTime(item.start) }}
+                                {{ item.title }}
+                                <span
+                                  v-if="currentChapterIndex === index"
+                                  class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full"
+                                  >播放中</span
+                                >
+                              </div>
+                              <div class="text-xs text-blue-500 font-mono text-right">
+                                {{ formatTime(item.start) }}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -149,50 +156,60 @@
                 </a-tab-pane>
 
                 <a-tab-pane key="2" title="课程大纲">
-                  <div class="p-4 text-center">
-                    <div
-                      class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 my-4"
-                    >
+                  <div>
+                    <div v-if="outlineLoading" class="flex justify-center items-center h-60">
+                      <a-spin size="large" tip="课程大纲加载中..." />
+                    </div>
+                    <div v-else class="p-4 text-center">
                       <div
-                        class="w-16 h-16 rounded-full bg-pink-500 flex items-center justify-center mb-3"
+                        class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 my-4"
                       >
-                        <i class="fas fa-book-open text-2xl text-white"></i>
-                      </div>
-                      <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
-                        AI课程大纲
-                      </h3>
-                      <p class="text-gray-600 dark:text-gray-300 text-sm">
-                        智能生成课程结构，梳理知识脉络
-                      </p>
-                      <div
-                        class="mt-3 px-4 py-1.5 bg-pink-500 text-white text-xs rounded-full inline-block"
-                      >
-                        即将上线
+                        <div
+                          class="w-16 h-16 rounded-full bg-pink-500 flex items-center justify-center mb-3"
+                        >
+                          <i class="fas fa-book-open text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                          AI课程大纲
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                          智能生成课程结构，梳理知识脉络
+                        </p>
+                        <div
+                          class="mt-3 px-4 py-1.5 bg-pink-500 text-white text-xs rounded-full inline-block"
+                        >
+                          即将上线
+                        </div>
                       </div>
                     </div>
                   </div>
                 </a-tab-pane>
 
                 <a-tab-pane key="3" title="内容总结">
-                  <div class="p-4 text-center">
-                    <div
-                      class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-800 my-4"
-                    >
+                  <div>
+                    <div v-if="summaryLoading" class="flex justify-center items-center h-60">
+                      <a-spin size="large" tip="内容总结加载中..." />
+                    </div>
+                    <div v-else class="p-4 text-center">
                       <div
-                        class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center mb-3"
+                        class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-800 my-4"
                       >
-                        <i class="fas fa-brain text-2xl text-white"></i>
-                      </div>
-                      <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
-                        AI内容总结
-                      </h3>
-                      <p class="text-gray-600 dark:text-gray-300 text-sm">
-                        一键生成视频摘要，快速掌握核心内容
-                      </p>
-                      <div
-                        class="mt-3 px-4 py-1.5 bg-blue-500 text-white text-xs rounded-full inline-block"
-                      >
-                        即将上线
+                        <div
+                          class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center mb-3"
+                        >
+                          <i class="fas fa-brain text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                          AI内容总结
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                          一键生成视频摘要，快速掌握核心内容
+                        </p>
+                        <div
+                          class="mt-3 px-4 py-1.5 bg-blue-500 text-white text-xs rounded-full inline-block"
+                        >
+                          即将上线
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -218,11 +235,7 @@ import XGPlayer from '@/components/video-XGPlayer.vue';
 const uploadData = JSON.parse(localStorage.getItem('upload') || 'null');
 import { Modal } from '@arco-design/web-vue';
 import { useChapterStore, useSubtitleStore } from '@/store';
-import type {
-  GenerateChapterResponse,
-  GenerateProgressDotResponse,
-  GenerateSubtitleResponse,
-} from '@/api/video/type';
+import type { GenerateChapterResponse, GenerateProgressDotResponse } from '@/api/video/type';
 const chapterStore = useChapterStore();
 const subtitleStore = useSubtitleStore();
 const xgPlayerRef = ref<typeof XGPlayer | null>(null);
@@ -242,12 +255,19 @@ const options = reactive({
 });
 //生成故事点
 async function progressDotList() {
+  if (localStorage.getItem('progressDot')) {
+    return;
+  }
   const res = await generateProgressDot();
-  // options.progressDot = res.data.map((item: any) => ({
-  //   time: item.time,
-  //   text: item.txt,
-  // }));
-  localStorage.setItem('progressDot', JSON.stringify(res.data));
+  Modal.success({
+    title: '故事点生成成功',
+    content: '故事点已生成，点击确认将故事点数据放入视频中。',
+    okText: '确认',
+    onOk: () => {
+      Object.assign(options, { progressDot: res.data });
+      localStorage.setItem('progressDot', JSON.stringify(res.data));
+    },
+  });
 }
 //生成雪碧图
 async function generateSpriteList() {
@@ -281,10 +301,16 @@ onUnmounted(() => {
   if (timer) window.clearInterval(timer);
 });
 
+const subtitleLoading = ref(false);
+const chapterLoading = ref(false);
+const outlineLoading = ref(false); // 课程大纲
+const summaryLoading = ref(false); // 内容总结
+
 const addCustomChapter = async () => {
   if (chapterStore.chapters.length > 0) {
     return;
   }
+  chapterLoading.value = true;
   try {
     const res = await generateChapter();
     Modal.success({
@@ -292,17 +318,18 @@ const addCustomChapter = async () => {
       content: '章节已生成，点击确认将章节数据放入视频中。',
       okText: '确认',
       onOk: () => {
-        options.chapters = res.data;
-        chapterStore.setChapters(res.data);
+        Object.assign(options, { chapters: res.data });
+        chapterStore.setChapters(res.data as unknown as GenerateChapterResponse[]);
       },
     });
   } catch (error) {
     console.error('Error fetching chapters:', error);
+  } finally {
+    chapterLoading.value = false;
   }
 };
 
 function seekTo(time: number) {
-  console.log(time);
   const playerComponent = xgPlayerRef.value;
   if (
     playerComponent &&
@@ -323,33 +350,73 @@ interface Subtitle {
 }
 const subtitleList = ref<Subtitle[]>([]);
 async function generateSubtitleFile() {
+  if (subtitleStore.subtitleList.length > 0) {
+    return;
+  }
+  subtitleLoading.value = true;
   try {
     const res = await generateSubtitle();
-    fetch(res.data.url)
-      .then((res) => res.text())
-      .then((text) => {
-        text.split('\n').forEach((item: string) => {
-          // 提取所有中文（含标点）
-          const match = item.match(/[\u4e00-\u9fa5，。！？、“”‘’（）《》【】]+/g);
-          if (match) {
-            subtitleList.value.push({ text: match.join('') });
-          }
-        });
-      });
-    const subtitle = res.data as GenerateSubtitleResponse;
-    (options.texttrack.list as GenerateSubtitleResponse[]).push(subtitle);
+    Object.assign(options, { texttrack: { list: [...options.texttrack.list, res.data] } });
     subtitleStore.setSubtitleList([res.data]);
   } catch (error) {
     console.error('Error fetching subtitle:', error);
+  } finally {
+    subtitleLoading.value = false;
   }
 }
-
+//解析字幕
+function parseSubtitle() {
+  if (subtitleStore.subtitleList.length === 0) {
+    return;
+  }
+  const url = subtitleStore.subtitleList[0].url;
+  fetch(url)
+    .then((res) => res.text())
+    .then((text) => {
+      text.split('\n').forEach((item: string) => {
+        // 提取所有中文（含标点）
+        const match = item.match(/[\u4e00-\u9fa5，。！？、“”‘’（）《》【】]+/g);
+        if (match) {
+          subtitleList.value.push({ text: match.join('') });
+        }
+      });
+    });
+}
+//切换标签页
 function onTabChange(key: string) {
   activeSubTab.value = key;
   if (key === 'subtitle') {
     generateSubtitleFile();
+    parseSubtitle();
   } else if (key === 'chapter') {
     addCustomChapter();
+  }
+  // 课程大纲、内容总结同理
+}
+//切换标签页
+function handleTabChange(key: string) {
+  console.log(key);
+
+  if (key === 'outline') {
+    fetchOutline();
+  } else if (key === 'summary') {
+    fetchSummary();
+  }
+}
+async function fetchOutline() {
+  outlineLoading.value = true;
+  try {
+    // await fetchOutlineApi();
+  } finally {
+    outlineLoading.value = false;
+  }
+}
+async function fetchSummary() {
+  summaryLoading.value = true;
+  try {
+    // await fetchSummaryApi();
+  } finally {
+    summaryLoading.value = false;
   }
 }
 </script>
