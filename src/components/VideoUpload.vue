@@ -184,8 +184,8 @@ const handleFile = async (file: File) => {
     uploading.value = true;
     progress.value = 0;
 
-    // const { data } = await axios.post(import.meta.env.VITE_APP_URL + '/upload', formData, {
-    const { data } = await axios.post('/upload', formData, {
+    const { data } = await axios.post(import.meta.env.VITE_APP_URL + '/upload', formData, {
+      // const { data } = await axios.post('/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

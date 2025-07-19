@@ -1,15 +1,11 @@
 <template>
   <div>
-    <div
-      class="min-h-screen bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
-    >
-      <div class="container mx-auto px-4 py-8">
-        <div class="flex flex-col lg:flex-row gap-8">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
           <!-- 视频播放器区域 -->
           <div class="lg:w-3/4">
-            <div
-              class="player-wrapper rounded-2xl shadow-2xl border border-sky-100 dark:border-gray-800 bg-black/90"
-            >
+            <div class="player-wrapper rounded-xl overflow-hidden shadow-lg bg-black">
               <XGPlayer
                 ref="xgPlayerRef"
                 player-id="demo-player"
@@ -18,151 +14,203 @@
                 class="w-full aspect-video"
               />
             </div>
+
             <!-- 视频信息区域 -->
-            <div
-              class="video-info mt-6 rounded-2xl shadow-lg border border-sky-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/80"
-            >
-              <h1 class="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white tracking-tight">
+            <div class="video-info mt-4 bg-white dark:bg-gray-800 rounded-lg p-4">
+              <h1 class="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
                 {{ uploadData?.title || '视频标题' }}
               </h1>
-              <div class="flex items-center gap-6 text-gray-500 dark:text-gray-400 text-lg">
-                <span class="flex items-center gap-2">
-                  <i class="fas fa-eye text-sky-500"></i>
+              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300 text-sm">
+                <span class="flex items-center gap-1">
+                  <i class="fas fa-eye text-pink-500"></i>
                   <span>1.2k 次观看</span>
                 </span>
-                <span class="flex items-center gap-2">
-                  <i class="fas fa-clock text-sky-500"></i>
+                <span class="flex items-center gap-1">
+                  <i class="fas fa-clock text-pink-500"></i>
                   <span>上传于 {{ new Date().toLocaleDateString() }}</span>
                 </span>
               </div>
             </div>
           </div>
-          <!-- 右侧信息面板 -->
+
+          <!-- 右侧信息面板 - 优化后 -->
           <div class="lg:w-1/4">
             <div
-              class="side-panel rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/90"
+              class="side-panel bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
             >
               <a-tabs
                 default-active-key="1"
                 lazy-load
                 class="custom-tabs"
                 :animation="true"
-                type="card"
-                size="large"
-                tabBarGutter="16"
+                type="rounded"
+                @change="handleTabChange"
               >
                 <a-tab-pane key="1" title="AI字幕&章节">
-                  <div class="p-4 relative">
-                    <div class="flex justify-between items-center mb-4">
-                      <!-- <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 tracking-wide">视频章节</h2> -->
-                    </div>
-                    <div class="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
+                  <div class="p-3">
+                    <!-- 标签页头部美化 -->
+                    <div class="mb-4">
                       <a-tabs
-                        default-active-key="chapter"
+                        default-active-key="null"
                         class="w-full"
-                        type="card"
-                        size="large"
-                        tabBarGutter="12"
+                        type="capsule"
+                        size="medium"
+                        tabBarGutter="6"
                         @change="onTabChange"
                       >
-                        <a-tab-pane key="subtitle" title="字幕时间轴">
-                          <a-timeline class="!pl-0">
-                            <a-timeline-item
-                              v-for="(item, index) in subtitleList"
-                              :key="index"
-                              :dotColor="'#0ea5e9'"
-                              :dot-type="'hollow'"
-                            >
-                              <div
-                                class="flex items-center justify-between rounded-xl border bg-white/95 dark:bg-gray-900/80 py-2 px-4 shadow-sm"
-                              >
-                                <div class="flex-1 min-w-0">
-                                  <div
-                                    class="font-semibold text-gray-800 dark:text-gray-100 truncate text-base"
-                                  >
-                                    {{ item.text }}
-                                  </div>
-                                </div>
-                                <div
-                                  class="ml-4 text-right min-w-[70px] font-mono text-base text-sky-500 dark:text-sky-400"
-                                >
-                                  <span>{{ formatTime(item.start) }}</span>
-                                  <span class="mx-1">-</span>
-                                  <span>{{ formatTime(item.end) }}</span>
-                                </div>
-                              </div>
-                            </a-timeline-item>
-                          </a-timeline>
-                        </a-tab-pane>
-                        <a-tab-pane key="chapter" title="章节列表">
-                          <a-timeline class="!pl-0">
-                            <a-timeline-item
-                              v-for="(item, index) in chapterStore.chapters"
-                              :key="index"
-                              :dotColor="currentChapterIndex === index ? '#0ea5e9' : '#cbd5e1'"
-                              :dot-type="currentChapterIndex === index ? 'solid' : 'hollow'"
-                              :class="[
-                                'group transition-all',
-                                currentChapterIndex === index
-                                  ? 'before:!bg-sky-500'
-                                  : 'before:!bg-gray-300 dark:before:!bg-gray-700',
-                              ]"
-                            >
-                              <div
-                                @click="seekTo(item.start)"
-                                :class="[
-                                  'flex items-center justify-between rounded-xl cursor-pointer border transition-all select-none',
-                                  'bg-white/95 dark:bg-gray-900/80',
-                                  'py-2 px-4',
-                                  'hover:bg-sky-50 dark:hover:bg-sky-800/60',
-                                  'hover:border-sky-400',
-                                  currentChapterIndex === index
-                                    ? 'border-2 border-sky-500 bg-sky-50 dark:bg-sky-900/40 shadow-lg'
-                                    : 'border-gray-200 dark:border-gray-700 shadow-sm',
-                                ]"
-                              >
-                                <div class="flex-1 min-w-0">
-                                  <div
-                                    class="font-semibold text-gray-800 dark:text-gray-100 truncate text-base"
-                                  >
-                                    {{ item.title }}
-                                  </div>
-                                </div>
-                                <div
-                                  class="ml-4 text-right min-w-[70px] font-mono text-base text-sky-500 dark:text-sky-400"
-                                >
-                                  <span>{{ formatTime(item.start) }}</span>
-                                  <span class="mx-1">-</span>
-                                  <span>{{
-                                    formatTime(
-                                      item.start +
-                                        (typeof item.duration === 'number'
-                                          ? item.duration
-                                          : parseFloat(item.duration)),
-                                    )
-                                  }}</span>
-                                </div>
-                              </div>
-                            </a-timeline-item>
-                          </a-timeline>
-                        </a-tab-pane>
+                        <a-tab-pane key="subtitle" title="字幕" />
+                        <a-tab-pane key="chapter" title="章节" />
                       </a-tabs>
                     </div>
-                  </div>
-                </a-tab-pane>
-                <a-tab-pane key="2" title="AI课程大纲">
-                  <div class="p-4">
-                    <div class="text-center py-8 text-gray-500">
-                      <i class="fas fa-book-open text-4xl mb-3 text-orange-500"></i>
-                      <p>AI课程大纲生成功能即将上线</p>
+                    <!-- 字幕区域 - 时间轴风格 -->
+                    <div v-if="activeSubTab === 'subtitle'">
+                      <div v-if="subtitleLoading" class="flex justify-center items-center h-60">
+                        <a-spin size="large" tip="字幕加载中..." />
+                      </div>
+                      <div v-else class="max-h-[600px] overflow-y-auto custom-scrollbar py-1">
+                        <div class="timeline relative pl-6">
+                          <div
+                            v-for="(item, index) in subtitleList"
+                            :key="index"
+                            :class="[
+                              'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
+                              'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
+                            ]"
+                          >
+                            <!-- 竖线 -->
+                            <div
+                              v-if="index !== subtitleList.length - 1"
+                              class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
+                            ></div>
+                            <!-- 圆点 -->
+                            <div
+                              class="w-3 h-3 rounded-full z-10 bg-blue-500 border-2 border-white"
+                              style="margin-left: -0.625rem"
+                            ></div>
+                            <!-- 内容 -->
+                            <div class="ml-4 flex-1 min-w-0">
+                              <div
+                                class="font-medium text-gray-800 dark:text-gray-100 text-sm mb-1"
+                              >
+                                {{ item.text }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 章节区域 - 时间轴风格 -->
+                    <div v-if="activeSubTab === 'chapter'">
+                      <div v-if="chapterLoading" class="flex justify-center items-center h-60">
+                        <a-spin size="large" tip="章节加载中..." />
+                      </div>
+                      <div v-else class="max-h-[600px] overflow-y-auto custom-scrollbar py-1">
+                        <div class="timeline relative pl-6">
+                          <div
+                            v-for="(item, index) in chapterStore.chapters"
+                            :key="index"
+                            @click="seekTo(item.start)"
+                            :class="[
+                              'timeline-item group cursor-pointer flex items-center min-h-[48px] py-2 relative',
+                              currentChapterIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : '',
+                              'hover:bg-blue-50 dark:hover:bg-blue-900/20 transition',
+                            ]"
+                          >
+                            <!-- 竖线 -->
+                            <div
+                              v-if="index !== chapterStore.chapters.length - 1"
+                              class="absolute left-2 top-5 w-0.5 h-[calc(100%-1.5rem)] bg-blue-200 dark:bg-blue-700 z-0"
+                            ></div>
+                            <!-- 圆点 -->
+                            <div
+                              :class="[
+                                'w-3 h-3 rounded-full z-10',
+                                currentChapterIndex === index
+                                  ? 'bg-blue-500 border-2 border-white'
+                                  : 'bg-blue-200',
+                              ]"
+                              style="margin-left: -0.625rem"
+                            ></div>
+                            <!-- 内容 -->
+                            <div class="ml-4 flex-1 min-w-0">
+                              <div
+                                class="font-semibold text-gray-800 dark:text-gray-100 text-sm flex items-center"
+                              >
+                                {{ item.title }}
+                                <span
+                                  v-if="currentChapterIndex === index"
+                                  class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full"
+                                  >播放中</span
+                                >
+                              </div>
+                              <div class="text-xs text-blue-500 font-mono text-right">
+                                {{ formatTime(item.start) }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </a-tab-pane>
-                <a-tab-pane key="3" title="AI内容总结">
-                  <div class="p-4">
-                    <div class="text-center py-8 text-gray-500">
-                      <i class="fas fa-brain text-4xl mb-3 text-orange-500"></i>
-                      <p>AI视频内容总结功能即将上线</p>
+
+                <a-tab-pane key="2" title="课程大纲">
+                  <div>
+                    <div v-if="outlineLoading" class="flex justify-center items-center h-60">
+                      <a-spin size="large" tip="课程大纲加载中..." />
+                    </div>
+                    <div v-else class="p-4 text-center">
+                      <div
+                        class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 my-4"
+                      >
+                        <div
+                          class="w-16 h-16 rounded-full bg-pink-500 flex items-center justify-center mb-3"
+                        >
+                          <i class="fas fa-book-open text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                          AI课程大纲
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                          智能生成课程结构，梳理知识脉络
+                        </p>
+                        <div
+                          class="mt-3 px-4 py-1.5 bg-pink-500 text-white text-xs rounded-full inline-block"
+                        >
+                          即将上线
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a-tab-pane>
+
+                <a-tab-pane key="3" title="内容总结">
+                  <div>
+                    <div v-if="summaryLoading" class="flex justify-center items-center h-60">
+                      <a-spin size="large" tip="内容总结加载中..." />
+                    </div>
+                    <div v-else class="p-4 text-center">
+                      <div
+                        class="inline-flex flex-col items-center justify-center p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-800 my-4"
+                      >
+                        <div
+                          class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center mb-3"
+                        >
+                          <i class="fas fa-brain text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                          AI内容总结
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                          一键生成视频摘要，快速掌握核心内容
+                        </p>
+                        <div
+                          class="mt-3 px-4 py-1.5 bg-blue-500 text-white text-xs rounded-full inline-block"
+                        >
+                          即将上线
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </a-tab-pane>
@@ -176,70 +224,56 @@
 </template>
 
 <script setup lang="ts">
-import { generateChapter } from '@/api/video';
+import {
+  generateChapter,
+  generateSubtitle,
+  generateProgressDot,
+  generateSprite,
+} from '@/api/video';
 import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import XGPlayer from '@/components/video-XGPlayer.vue';
 const uploadData = JSON.parse(localStorage.getItem('upload') || 'null');
-import { useChapterStore } from '@/store/chapters';
 import { Modal } from '@arco-design/web-vue';
+import { useChapterStore, useSubtitleStore } from '@/store';
+import type { GenerateChapterResponse, GenerateProgressDotResponse } from '@/api/video/type';
 const chapterStore = useChapterStore();
-interface Chapter {
-  title: string;
-  start: number;
-  duration: number;
-}
+const subtitleStore = useSubtitleStore();
+const xgPlayerRef = ref<typeof XGPlayer | null>(null);
+const currentChapterIndex = ref(-1);
+const activeSubTab = ref('null'); // 新增状态管理当前激活的子标签
 const options = reactive({
   url: uploadData.videoUrl,
   poster: uploadData.coverPicture,
   width: '1196px',
   height: '673',
-  progressDot: [],
+  progressDot: [] as GenerateProgressDotResponse[],
   thumbnail: {},
   texttrack: {
-    list: [
-      {
-        id: 'vtt1',
-        url: '',
-        language: 'zh-cn',
-        text: '中文',
-        default: false,
-      },
-      {
-        id: 'vtt2',
-        url: 'https://x-short-prod.s3.ap-northeast-1.amazonaws.com/prod/videos/2-25126641776734208/0022dcd8467e60231f783e29ceff4d4d/srt.vtt',
-        language: 'en',
-        text: '英文',
-        default: false,
-      },
-    ],
-    domRender: true,
-    defaultOpen: false, // 是否默认开启字幕
-    mode: 'bg',
-    line: 'double',
-    updateMode: 'vod',
-    renderMode: 'normal',
-    debugger: 'false',
-    style: {
-      follow: true, // 是否跟随控制栏调整位置
-      mode: 'stroke', // 字体显示模式 stroke/bg（文字描边/文字背景），默认为stroke
-      followBottom: 50, // 跟随底部控制栏的高度
-      fitVideo: true, // 是否跟随视频自动调整字号
-      offsetBottom: 2, // 字幕距离画面底部百分比，默认2%
-      baseSizeX: 49, // 横屏视频适配基准字号
-      baseSizeY: 28, // 竖屏视频适配基准字号
-      minSize: 16, // pc端最小字号
-      minMobileSize: 13, // 移动端最小字号
-      line: 'double', // 最大显示行数 single/double/three
-      fontColor: '#fff', // 字体颜色
-    },
+    list: [],
   },
-  chapters: [] as Chapter[],
+  chapters: [] as GenerateChapterResponse[],
 });
-
-const xgPlayerRef = ref<typeof XGPlayer | null>(null);
-const currentChapterIndex = ref(-1);
-
-// 自动高亮当前播放章节
+//生成故事点
+async function progressDotList() {
+  if (localStorage.getItem('progressDot')) {
+    return;
+  }
+  const res = await generateProgressDot();
+  Modal.success({
+    title: '故事点生成成功',
+    content: '故事点已生成，点击确认将故事点数据放入视频中。',
+    okText: '确认',
+    onOk: () => {
+      Object.assign(options, { progressDot: res.data });
+      localStorage.setItem('progressDot', JSON.stringify(res.data));
+    },
+  });
+}
+//生成雪碧图
+async function generateSpriteList() {
+  const res = await generateSprite();
+  options.thumbnail = res.data;
+}
 function updateCurrentChapter() {
   const playerComponent = xgPlayerRef.value;
   if (!playerComponent || !playerComponent.player) return;
@@ -256,18 +290,27 @@ function updateCurrentChapter() {
   }
   currentChapterIndex.value = found;
 }
+
 let timer: number | null = null;
 onMounted(() => {
+  progressDotList();
+  generateSpriteList();
   timer = window.setInterval(updateCurrentChapter, 500);
 });
 onUnmounted(() => {
   if (timer) window.clearInterval(timer);
 });
 
+const subtitleLoading = ref(false);
+const chapterLoading = ref(false);
+const outlineLoading = ref(false); // 课程大纲
+const summaryLoading = ref(false); // 内容总结
+
 const addCustomChapter = async () => {
   if (chapterStore.chapters.length > 0) {
     return;
   }
+  chapterLoading.value = true;
   try {
     const res = await generateChapter();
     Modal.success({
@@ -275,22 +318,18 @@ const addCustomChapter = async () => {
       content: '章节已生成，点击确认将章节数据放入视频中。',
       okText: '确认',
       onOk: () => {
-        options.chapters = res.data.chapters;
-        chapterStore.setChapters(res.data.chapters);
+        Object.assign(options, { chapters: res.data });
+        chapterStore.setChapters(res.data as unknown as GenerateChapterResponse[]);
       },
     });
   } catch (error) {
     console.error('Error fetching chapters:', error);
   } finally {
-    console.log(options.chapters);
+    chapterLoading.value = false;
   }
 };
 
-// 跳转到指定时间点
 function seekTo(time: number) {
-  console.log(time);
-
-  // 通过ref获取XGPlayer实例并调用其seek方法
   const playerComponent = xgPlayerRef.value;
   if (
     playerComponent &&
@@ -301,275 +340,284 @@ function seekTo(time: number) {
   }
 }
 
-// 格式化时间
 function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
-
-// 字幕数据结构和生成方法（模拟）
-// 定义类型
-interface SubtitleItem {
+interface Subtitle {
   text: string;
-  start: number;
-  end: number;
 }
-
-// 使用具体类型
-const subtitleList = ref<SubtitleItem[]>([]);
-function generateSubtitle() {
-  // 这里应调用实际API，以下为模拟数据
-  subtitleList.value = [
-    { text: '字幕片段一', start: 0, end: 10 },
-    { text: '字幕片段二', start: 10, end: 25 },
-    { text: '字幕片段三', start: 25, end: 40 },
-  ];
+const subtitleList = ref<Subtitle[]>([]);
+async function generateSubtitleFile() {
+  if (subtitleStore.subtitleList.length > 0) {
+    return;
+  }
+  subtitleLoading.value = true;
+  try {
+    const res = await generateSubtitle();
+    Object.assign(options, { texttrack: { list: [...options.texttrack.list, res.data] } });
+    subtitleStore.setSubtitleList([res.data]);
+  } catch (error) {
+    console.error('Error fetching subtitle:', error);
+  } finally {
+    subtitleLoading.value = false;
+  }
 }
-
-// tab切换时自动生成字幕或章节
+//解析字幕
+function parseSubtitle() {
+  if (subtitleStore.subtitleList.length === 0) {
+    return;
+  }
+  const url = subtitleStore.subtitleList[0].url;
+  fetch(url)
+    .then((res) => res.text())
+    .then((text) => {
+      text.split('\n').forEach((item: string) => {
+        // 提取所有中文（含标点）
+        const match = item.match(/[\u4e00-\u9fa5，。！？、“”‘’（）《》【】]+/g);
+        if (match) {
+          subtitleList.value.push({ text: match.join('') });
+        }
+      });
+    });
+}
+//切换标签页
 function onTabChange(key: string) {
+  activeSubTab.value = key;
   if (key === 'subtitle') {
-    generateSubtitle();
+    generateSubtitleFile();
+    parseSubtitle();
   } else if (key === 'chapter') {
     addCustomChapter();
+  }
+  // 课程大纲、内容总结同理
+}
+//切换标签页
+function handleTabChange(key: string) {
+  console.log(key);
+
+  if (key === 'outline') {
+    fetchOutline();
+  } else if (key === 'summary') {
+    fetchSummary();
+  }
+}
+async function fetchOutline() {
+  outlineLoading.value = true;
+  try {
+    // await fetchOutlineApi();
+  } finally {
+    outlineLoading.value = false;
+  }
+}
+async function fetchSummary() {
+  summaryLoading.value = true;
+  try {
+    // await fetchSummaryApi();
+  } finally {
+    summaryLoading.value = false;
   }
 }
 </script>
 
 <style>
-/* 自定义滚动条样式 */
+/* 自定义滚动条 - 更现代化 */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #e0e7ef;
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #bae6fd;
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #7dd3fc;
+  background: rgba(0, 0, 0, 0.25);
 }
 
-/* 自定义标签页样式 */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 主标签页样式 - 更精致的B站风格 */
 .custom-tabs .arco-tabs-nav-tab {
-  background-color: #f9fafb;
+  padding-left: 1rem;
+  padding-right: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  background: transparent;
 }
 
 .custom-tabs .arco-tabs-tab {
-  color: #6b7280;
-  transition: color 0.3s ease;
+  color: #64748b;
+  font-weight: 500;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  font-size: 1.1rem;
+  transition:
+    color 0.2s,
+    background 0.2s;
+  background: transparent;
+  text-align: center;
 }
 
 .custom-tabs .arco-tabs-tab:hover {
-  color: #f97316;
+  color: #1e293b;
 }
 
 .custom-tabs .arco-tabs-tab-active {
-  color: #f97316;
+  color: #00a1d6;
+  background: #e6f6fd;
+  font-weight: 600;
+  position: relative;
 }
 
 .custom-tabs .arco-tabs-tab-active::after {
-  background: linear-gradient(to right, #f97316, #fb923c);
-}
-
-/* 时间轴样式优化 */
-.timeline-item .arco-timeline-item-content {
-  background-color: #f9fafb;
-  padding: 0.55rem;
-  transition: all 0.3s ease;
-}
-
-.timeline-item .arco-timeline-item-content:hover {
-  background-color: #f3f4f6;
-  border-color: #f97316;
-}
-
-.timeline-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: linear-gradient(to right, #f97316, #fb923c);
-  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
-}
-
-.timeline-item .arco-timeline-item-line {
-  background: linear-gradient(to bottom, #f97316, #fb923c);
-}
-
-/* 播放器容器样式 */
-.player-wrapper {
-  position: relative;
-  background-color: #000000;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  aspect-ratio: 16/9;
-}
-
-/* 按钮样式优化 */
-.custom-button {
-  background: linear-gradient(to right, #f97316, #fb923c) !important;
-  border: none !important;
-  box-shadow:
-    0 4px 6px -1px rgba(249, 115, 22, 0.1),
-    0 2px 4px -1px rgba(249, 115, 22, 0.06) !important;
-  transition: all 0.3s ease !important;
-}
-
-.custom-button:hover {
-  opacity: 0.9;
-  transform: scale(1.02);
-  box-shadow:
-    0 10px 15px -3px rgba(249, 115, 22, 0.1),
-    0 4px 6px -2px rgba(249, 115, 22, 0.05) !important;
-}
-
-/* 视频信息区域 */
-.video-info {
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-}
-
-/* 右侧面板 */
-.side-panel {
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
-}
-
-/* 加载动画优化 */
-.loading-overlay {
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-}
-
-.loading-spinner {
-  border-color: #e5e7eb;
-  border-top-color: #f97316;
-}
-
-.loading-text {
-  color: #6b7280;
-}
-
-.fullscreen-loading {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  transition: all 0.3s;
-}
-
-.loader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.circular {
-  animation: rotate 2s linear infinite;
-  height: 80px;
-  width: 80px;
-}
-
-.path {
-  stroke: #f97316;
-  stroke-dasharray: 90, 150;
-  stroke-dashoffset: 0;
-  stroke-linecap: round;
-  animation: dash 1.5s ease-in-out infinite;
-}
-
-.loading-text {
-  margin-top: 24px;
-  font-size: 1.2rem;
-  color: #0ea5e9;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
-  }
-
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
-  }
-
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
-  }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.local-loading {
+  content: '';
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  border-radius: 1rem;
+  height: 2px;
+  background: #00a1d6;
+  border-radius: 9999px;
 }
 
-.chapter-title.clickable {
-  cursor: pointer;
-  color: #f97316;
-  transition: color 0.2s;
+.custom-tabs .arco-tabs-content {
+  padding-top: 1rem;
 }
 
-.chapter-title.clickable:hover {
-  color: #fb923c;
-  text-decoration: underline;
+/* 时间轴样式 - B站风格 */
+.arco-timeline-item-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.arco-timeline-item-content {
+  padding-left: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.arco-timeline-item-line {
+  background: #e5e7eb;
+}
+
+.dark .arco-timeline-item-line {
+  background: #334155;
+}
+
+/* 胶囊标签样式 - 抖音风格优化 */
+.arco-tabs-nav-type-capsule .arco-tabs-tab {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  border-radius: 9999px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.arco-tabs-nav-type-capsule .arco-tabs-tab-active {
+  background: linear-gradient(to right, #00a1d6, #3eb6e0);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 161, 214, 0.15);
+  transform: translateY(-1px);
+}
+
+/* 圆角标签样式 - B站风格优化 */
+.arco-tabs-nav-type-rounded .arco-tabs-tab {
+  border-radius: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.arco-tabs-nav-type-rounded .arco-tabs-tab-active {
+  background: linear-gradient(to right, #e0f7ff, #b3e6fa);
+  color: #00a1d6;
+  box-shadow: 0 2px 8px rgba(0, 161, 214, 0.1);
+  transform: translateY(-1px);
+}
+
+.dark .arco-tabs-nav-type-rounded .arco-tabs-tab-active {
+  background: rgba(0, 161, 214, 0.18);
+  color: #00a1d6;
+}
+
+/* 面板整体美化 */
+.side-panel {
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.side-panel:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* 章节条目动画 */
+.chapter-item {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.chapter-item:hover {
+  transform: translateX(3px);
+}
+
+/* 章节/字幕高亮色 */
+.chapter-item.active,
+.subtitle-item.active {
+  background: #e6f6fd;
+  border-left: 4px solid #00a1d6;
+  color: #00a1d6;
+}
+
+/* 章节/字幕时间主色 */
+.chapter-item .time,
+.subtitle-item .time {
+  color: #00a1d6;
+}
+
+/* icon主色 */
+.text-bilibili-blue,
+.icon-bilibili-blue {
+  color: #00a1d6 !important;
+}
+
+.bg-bilibili-blue {
+  background: #00a1d6 !important;
 }
 </style>
