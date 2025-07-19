@@ -1,9 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { handleError } from './errorHandler';
+console.log(import.meta.env.VITE_APP_URL);
+
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
-  timeout: 30000,
+  baseURL: import.meta.env.VITE_APP_URL,
+  timeout: 300000,
 });
 
 // 请求拦截器

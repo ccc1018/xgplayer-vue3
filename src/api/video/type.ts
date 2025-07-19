@@ -1,3 +1,8 @@
+export interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
 // 生成章节
 export interface GenerateChapterResponse {
   start: number;
