@@ -12,12 +12,17 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:8080',
+    //     // target: 'https://efcb7fd82bfe.ngrok-free.app',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, ''),
+    //   },
+    // },
+    port: 8000,
+    host: '0.0.0.0',
+    open: true,
+    // allowedHosts: ['4vr0730sy707.vicp.fun'],
   },
 });

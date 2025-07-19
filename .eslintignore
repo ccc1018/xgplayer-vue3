@@ -1,0 +1,18 @@
+# 构建输出
+dist/
+build/
+.vite/
+
+# 依赖
+node_modules/
+
+# 压缩文件
+*.min.js
+*.bundle.js
+
+# 覆盖率报告
+coverage/
+
+# 其他
+*.log
+.DS_Store 

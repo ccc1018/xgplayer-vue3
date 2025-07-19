@@ -36,7 +36,7 @@
         >
           <input
             type="file"
-            accept="video/*,.mp4,.mov"
+            accept="video/*,.mp4"
             class="hidden"
             @change="handleFileChange"
             ref="fileInput"
@@ -104,7 +104,7 @@
               <p
                 class="text-base text-gray-500 group-hover:text-gray-600 transition-colors duration-300"
               >
-                支持 MP4, MOV 格式
+                支持 MP4 格式
               </p>
             </div>
           </div>
@@ -185,7 +185,6 @@ const handleFile = async (file: File) => {
     progress.value = 0;
 
     const { data } = await axios.post(import.meta.env.VITE_APP_URL + '/upload', formData, {
-      // const { data } = await axios.post('/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

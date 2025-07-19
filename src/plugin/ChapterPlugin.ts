@@ -22,7 +22,8 @@ export default class ChapterPlugin extends Plugin {
     return {
       position: POSITIONS.CONTROLS_LEFT,
       text: '章节',
-      icon: '<svg t="1749716751903" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5035" width="200" height="200"><path d="M400 876.8l339.2-339.2v-44.8L400 156.8l-44.8 44.8 313.6 313.6-313.6 316.8z" fill="#707070" p-id="5036"></path></svg>',
+      icon: '',
+      // icon: '<svg t="1749716751903" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5035" width="200" height="200"><path d="M400 876.8l339.2-339.2v-44.8L400 156.8l-44.8 44.8 313.6 313.6-313.6 316.8z" fill="#707070" p-id="5036"></path></svg>',
       index: 1,
       iconStyle: {
         width: '5px',

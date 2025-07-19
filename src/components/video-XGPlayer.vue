@@ -53,7 +53,7 @@ const initPlayer = async () => {
       props.options.progressDot.length > 0
         ? props.options.progressDot
         : JSON.parse(localStorage.getItem('progressDot') || '[]'),
-    thumbnail: props.options.thumbnail,
+    thumbnail: props.options.thumbnail || JSON.parse(localStorage.getItem('thumbnail') || '[]'),
     lang: 'zh-cn',
     controls: {
       autoHide: true,
@@ -63,26 +63,6 @@ const initPlayer = async () => {
         props.options.texttrack.list.length > 0
           ? props.options.texttrack.list
           : subtitleStore.getSubtitleList(),
-      domRender: true,
-      defaultOpen: false,
-      mode: 'bg',
-      line: 'double',
-      updateMode: 'vod',
-      renderMode: 'normal',
-      debugger: 'false',
-      style: {
-        follow: true,
-        mode: 'stroke',
-        followBottom: 50,
-        fitVideo: true,
-        offsetBottom: 2,
-        baseSizeX: 49,
-        baseSizeY: 28,
-        minSize: 16,
-        minMobileSize: 13,
-        line: 'double',
-        fontColor: '#fff',
-      },
     },
   });
   console.log(props.options);
