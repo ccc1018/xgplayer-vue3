@@ -179,7 +179,7 @@ const handleFile = async (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('courseName', courseName.value.trim());
-
+  localStorage.setItem('courseName', courseName.value);
   try {
     uploading.value = true;
     progress.value = 0;

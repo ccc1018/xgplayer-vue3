@@ -3,15 +3,29 @@
     <a-config-provider>
       <div class="min-h-screen">
         <!-- 标题栏 -->
-        <div
-          class="sticky top-0 z-30 flex items-center h-16 px-4 bg-white shadow-sm border-b border-gray-200"
-        >
-          <a-button type="text" shape="circle" @click="goHome" class="mr-2">
-            <icon-arrow-left />
-          </a-button>
-          <span class="text-xl font-bold text-gray-900 flex-1 text-center select-none">
-            基于AI大模型的教学视频多模态解析与知识重构系统
-          </span>
+        <div class="ai-header">
+          <div class="ai-header-inner">
+            <a-button type="text" shape="circle" @click="goHome" class="header-back-btn">
+              <icon-arrow-left />
+            </a-button>
+            <span class="ai-header-logo">
+              <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" fill="#6366f1" fill-opacity="0.12" />
+                <path
+                  d="M16 32L24 16L32 32"
+                  stroke="#6366f1"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+                <circle cx="24" cy="28" r="2.5" fill="#6366f1" />
+              </svg>
+            </span>
+            <div class="ai-header-title-block">
+              <div class="ai-header-title">基于AI大模型的教学视频多模态解析与知识重构系统</div>
+              <div class="ai-header-underline"></div>
+              <div class="ai-header-subtitle">智能 · 高效 · 多模态 · 教学创新</div>
+            </div>
+          </div>
         </div>
         <div class="app-container p-10">
           <div class="flex flex-col lg:flex-row gap-8">
@@ -26,10 +40,20 @@
                   class="w-full aspect-video"
                 />
               </div>
+
+              <div class="mt-6 bg-white p-6 shadow-lg">
+                <h2 class="text-xl font-bold mb-4 dark:text-white">数据结构与算法 - 栈的应用</h2>
+                <a-button type="primary" class="mr-3" @click="handleDownload">
+                  <template #icon>
+                    <i class="fas fa-download"></i>
+                  </template>
+                  下载视频
+                </a-button>
+              </div>
             </div>
             <!-- 右侧面板 -->
             <div class="w-full lg:w-[440px]">
-              <div class="side-panel h-[620px]">
+              <div class="side-panel h-[750px]">
                 <a-tabs
                   default-active-key="1"
                   lazy-load
@@ -58,7 +82,7 @@
                         <div v-if="subtitleLoading" class="flex justify-center items-center h-60">
                           <a-spin size="large" tip="字幕加载中..." />
                         </div>
-                        <div v-else class="max-h-[500px] overflow-y-auto custom-scrollbar py-1">
+                        <div v-else class="max-h-[550px] overflow-y-auto custom-scrollbar py-1">
                           <div class="timeline">
                             <div
                               v-for="(item, index) in subtitleList"
@@ -80,7 +104,7 @@
                         <div v-if="chapterLoading" class="flex justify-center items-center h-60">
                           <a-spin size="large" tip="章节加载中..." />
                         </div>
-                        <div v-else class="max-h-[500px] overflow-y-auto custom-scrollbar py-1">
+                        <div v-else class="max-h-[550px] overflow-y-auto custom-scrollbar py-1">
                           <div class="timeline">
                             <div
                               v-for="(item, index) in chapterStore.chapters"
@@ -466,10 +490,17 @@ async function generateSubtitleFile() {
   try {
     const res = await generateSubtitle();
     if (res.code == 200) {
-      Object.assign(options, { texttrack: { list: [...options.texttrack.list, res.data] } });
-      subtitleStore.setSubtitleList([res.data]);
-      // 字幕数据获取成功后，解析字幕内容
-      parseSubtitle();
+      Modal.success({
+        title: '字幕生成成功',
+        content: '点击确认将字幕自动放入视频。',
+        okText: '确认',
+        onOk: () => {
+          Object.assign(options, { texttrack: { list: [...options.texttrack.list, res.data] } });
+          subtitleStore.setSubtitleList([res.data]);
+          // 字幕数据获取成功后，解析字幕内容
+          parseSubtitle();
+        },
+      });
     } else {
       subtitleLoading.value = false; // 如果请求失败，立即设置loading为false
     }
@@ -502,6 +533,23 @@ function parseSubtitle() {
       subtitleLoading.value = false; // 解析出错时设置loading为false
     });
 }
+//下载视频
+const handleDownload = () => {
+  // 下载视频
+  // downloadVideo(props.options.url);
+  const link = document.createElement('a');
+  link.href = uploadData.videoUrl;
+  link.download = 'video.mp4';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  Modal.success({
+    title: '下载成功',
+    content: '视频已成功下载到您的设备。',
+    okText: '确定',
+    alignCenter: true,
+  });
+};
 //切换标签页
 function onTabChange(key: string) {
   activeSubTab.value = key;
@@ -567,8 +615,8 @@ async function fetchSummary() {
 }
 
 * {
-  margin: 0;
-  padding: 0;
+  /* margin: 0; */
+  /* padding: 0; */
   box-sizing: border-box;
   font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -836,5 +884,85 @@ body.dark {
   50% {
     opacity: 0;
   }
+}
+
+.ai-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+  backdrop-filter: blur(8px);
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.ai-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+  height: 90px;
+  position: relative;
+}
+
+.header-back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.ai-header-logo {
+  margin-right: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  background: linear-gradient(135deg, #e0e7ff 60%, #f0f4ff 100%);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+}
+
+.ai-header-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ai-header-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #232946;
+  line-height: 1.1;
+  text-shadow: 0 2px 16px rgba(99, 102, 241, 0.1);
+  background: linear-gradient(90deg, #6366f1 30%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.ai-header-underline {
+  width: 80px;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6366f1 0%, #0ea5e9 100%);
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px #6366f133;
+}
+
+.ai-header-subtitle {
+  font-size: 1.05rem;
+  color: #64748b;
+  letter-spacing: 2px;
+  font-weight: 500;
+  margin-left: 2px;
+  text-align: center;
 }
 </style>
