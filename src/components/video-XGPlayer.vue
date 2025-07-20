@@ -33,6 +33,8 @@ const initPlayer = async () => {
     height: props.options.height,
     //封面图地址
     poster: props.options.poster,
+    //下载
+    download: true,
     //是否启用流式布局
     fluid: true,
     //设置/返回当前视频播放倍速
@@ -65,7 +67,6 @@ const initPlayer = async () => {
           : subtitleStore.getSubtitleList(),
     },
   });
-  console.log(props.options);
 };
 onMounted(() => {
   initPlayer(); // 确保在 DOM 渲染完成后调用播放器初始化

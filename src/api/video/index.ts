@@ -7,7 +7,7 @@ import type {
   GenerateSpriteResponse,
 } from './type';
 // 生成章节
-export const generateChapter = (): Promise<ApiResponse<GenerateChapterResponse>> => {
+export const generateChapter = (): Promise<ApiResponse<GenerateChapterResponse[]>> => {
   return request.get('/Chapter');
 };
 //生成字幕
