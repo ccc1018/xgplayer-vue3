@@ -12,8 +12,24 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,cjs,mjs,json,vue}\"",
     "format:ci": "prettier --list-different \"**/*.{ts,tsx,js,jsx}\"",
     "postinstall": "husky install",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "size": "size-limit"
   },
+  "size-limit": [
+    {
+      "path": "dist/assets/index-*.js",
+      "limit": "180 kB"
+    },
+    {
+      "path": "dist/assets/vendor-*.js",
+      "limit": "120 kB"
+    },
+    {
+      "path": "dist/assets/*.js",
+      "limit": "450 kB",
+      "name": "全部 JS"
+    }
+  ],
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^8.33.1",
     "@typescript-eslint/parser": "^8.33.1",
@@ -32,6 +48,8 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.28.0",
+    "@lhci/cli": "^0.15.1",
+    "@size-limit/preset-app": "^13.0.3",
     "@tailwindcss/vite": "^4.1.8",
     "@types/node": "^22.15.30",
     "@types/vue": "^2.0.0",
